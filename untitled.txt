@@ -1,0 +1,120 @@
+-- Criando o ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Função para criar o botão de minimizar
+local function createMinimizeButton(frame)
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Size = UDim2.new(0, 50, 0, 50)
+    minimizeButton.Position = UDim2.new(1, -55, 0, 5)
+    minimizeButton.Text = "9"
+    minimizeButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+    minimizeButton.BackgroundTransparency = 1
+    minimizeButton.Parent = frame
+
+    local minimized = false
+    minimizeButton.MouseButton1Click:Connect(function()
+        minimized = not minimized
+        if minimized then
+            frame.Size = UDim2.new(0, 300, 0, 50)
+        else
+            frame.Size = UDim2.new(0, 300, 0, 350)
+        end
+    end)
+end
+
+-- Criando o Frame Principal que conterá as Guias
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 300, 0, 350)
+mainFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.BorderColor3 = Color3.fromRGB(0, 255, 0)
+mainFrame.BorderSizePixel = 2
+mainFrame.Draggable = true
+mainFrame.Active = true
+mainFrame.Parent = screenGui
+
+-- Adicionando o botão de minimizar ao Frame Principal
+createMinimizeButton(mainFrame)
+
+-- Criando a Primeira Guia
+local frame1 = Instance.new("Frame")
+frame1.Size = UDim2.new(1, 0, 0, 150)
+frame1.Position = UDim2.new(0, 0, 0, 0)
+frame1.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame1.BorderColor3 = Color3.fromRGB(0, 255, 0)
+frame1.BorderSizePixel = 2
+frame1.Parent = mainFrame
+
+-- Adicionando Título na Primeira Guia
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0.2, 0)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "ADOUFO INV-BETA V1"
+titleLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+titleLabel.TextScaled = true
+titleLabel.Parent = frame1
+
+-- Adicionando Campo de Texto para Nome do Jogador
+local nameBox = Instance.new("TextBox")
+nameBox.Size = UDim2.new(0.8, 0, 0.2, 0)
+nameBox.Position = UDim2.new(0.1, 0, 0.3, 0)
+nameBox.PlaceholderText = "Nome do Player"
+nameBox.Parent = frame1
+
+-- Criando a Segunda Guia
+local frame2 = Instance.new("Frame")
+frame2.Size = UDim2.new(1, 0, 0, 200)
+frame2.Position = UDim2.new(0, 0, 0.428, 0)
+frame2.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame2.BorderColor3 = Color3.fromRGB(0, 255, 0)
+frame2.BorderSizePixel = 2
+frame2.Parent = mainFrame
+
+-- Adicionando Título na Segunda Guia
+local inventoryLabel = Instance.new("TextLabel")
+inventoryLabel.Size = UDim2.new(1, 0, 0.2, 0)
+inventoryLabel.Position = UDim2.new(0, 0, 0, 0)
+inventoryLabel.BackgroundTransparency = 1
+inventoryLabel.Text = "Inventário"
+inventoryLabel.TextColor3 = Color3.fromRGB(255, 0, 0)  -- Alterado para vermelho
+inventoryLabel.TextScaled = true
+inventoryLabel.Parent = frame2
+
+-- Adicionando Lista de Inventário
+local inventoryList = Instance.new("TextLabel")
+inventoryList.Size = UDim2.new(0.9, 0, 0.7, 0)
+inventoryList.Position = UDim2.new(0.05, 0, 0.25, 0)
+inventoryList.BackgroundTransparency = 1
+inventoryList.Text = ""
+inventoryList.TextColor3 = Color3.fromRGB(255, 255, 255)
+inventoryList.TextScaled = true
+inventoryList.TextWrapped = true
+inventoryList.Parent = frame2
+
+-- Função para obter inventário do jogador
+local function getInventory(playerName)
+    local player = game.Players:FindFirstChild(playerName)
+    if player then
+        local inventoryItems = {}
+        for _, item in ipairs(player.Backpack:GetChildren()) do
+            table.insert(inventoryItems, item.Name)
+        end
+        if #inventoryItems == 0 then
+            return "Este jogador não tem nada no inventário"
+        else
+            return table.concat(inventoryItems, ", ")
+        end
+    else
+        return "Jogador não encontrado"
+    end
+end
+
+-- Conectar função ao campo de texto
+nameBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local playerName = nameBox.Text
+        inventoryList.Text = getInventory(playerName)
+    end
+end)
