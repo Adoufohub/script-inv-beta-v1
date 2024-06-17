@@ -1,120 +1,154 @@
--- Criando o ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
 
--- Função para criar o botão de minimizar
-local function createMinimizeButton(frame)
-    local minimizeButton = Instance.new("TextButton")
-    minimizeButton.Size = UDim2.new(0, 50, 0, 50)
-    minimizeButton.Position = UDim2.new(1, -55, 0, 5)
-    minimizeButton.Text = "9"
-    minimizeButton.TextColor3 = Color3.fromRGB(255, 0, 0)
-    minimizeButton.BackgroundTransparency = 1
-    minimizeButton.Parent = frame
+-- Função para criar uma explosão controlada e emitir partículas roxas
+local function createExplosion(position, playerToIgnore)
+    local explosion = Instance.new("Explosion")
+    explosion.Position = position
+    explosion.BlastRadius = 5  -- Ajuste o raio da explosão conforme necessário (1 metro quadrado)
+    explosion.BlastPressure = 500000
+    explosion.DestroyJointRadiusPercent = 1
+    explosion.Parent = workspace
 
-    local minimized = false
-    minimizeButton.MouseButton1Click:Connect(function()
-        minimized = not minimized
-        if minimized then
-            frame.Size = UDim2.new(0, 300, 0, 50)
-        else
-            frame.Size = UDim2.new(0, 300, 0, 350)
+    -- Emitir partículas roxas na área da explosão
+    local particleEmitter = Instance.new("ParticleEmitter")
+    particleEmitter.Color = ColorSequence.new(Color3.fromRGB(128, 0, 128))
+    particleEmitter.Size = NumberSequence.new(5)
+    particleEmitter.Texture = "rbxassetid://244912518"  -- Textura de faísca do Roblox
+    particleEmitter.Lifetime = NumberRange.new(5)
+    particleEmitter.Speed = NumberRange.new(20)
+    particleEmitter.Rate = 1000
+    particleEmitter.Parent = explosion
+
+    -- Danificar jogadores na explosão
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= playerToIgnore then
+            local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:TakeDamage(100)  -- Ajuste conforme necessário
+            end
         end
+    end
+
+    -- Criar uma luz roxa forte na explosão
+    local light = Instance.new("PointLight")
+    light.Color = Color3.fromRGB(128, 0, 128)
+    light.Brightness = 10
+    light.Range = 20
+    light.Parent = explosion
+    wait(7)  -- Luz roxa dura 7 segundos
+    light:Destroy()
+
+    -- Aguardar 5 segundos antes de destruir o emissor de partículas
+    wait(5)
+    particleEmitter:Destroy()
+end
+
+-- Função para exibir a GUI temporária ao jogador
+local function showTemporaryGUI(player)
+    local gui = Instance.new("ScreenGui")
+    gui.Parent = player.PlayerGui
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0.3, 0, 0.1, 0)
+    frame.Position = UDim2.new(0.5, 0, 0.1, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    frame.BackgroundTransparency = 0.5
+    frame.BorderSizePixel = 0
+    frame.Parent = gui
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.Text = "Vou te fazer viajar pra um mundo bem mais que infinito! Veja no fundo do olhar, maldição, esse é seu exterminio!"
+    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Font = Enum.Font.SourceSansBold
+    textLabel.TextScaled = true
+    textLabel.Parent = frame
+
+    -- Aguardar até que o jogador morra para remover a GUI
+    local playerCharacter = player.Character or player.CharacterAdded:Wait()
+    playerCharacter:WaitForChild("Humanoid").Died:Connect(function()
+        wait(7)  -- Aguardar 7 segundos antes de remover a GUI
+        gui:Destroy()
     end)
 end
 
--- Criando o Frame Principal que conterá as Guias
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 350)
-mainFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-mainFrame.BorderColor3 = Color3.fromRGB(0, 255, 0)
-mainFrame.BorderSizePixel = 2
-mainFrame.Draggable = true
-mainFrame.Active = true
-mainFrame.Parent = screenGui
-
--- Adicionando o botão de minimizar ao Frame Principal
-createMinimizeButton(mainFrame)
-
--- Criando a Primeira Guia
-local frame1 = Instance.new("Frame")
-frame1.Size = UDim2.new(1, 0, 0, 150)
-frame1.Position = UDim2.new(0, 0, 0, 0)
-frame1.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-frame1.BorderColor3 = Color3.fromRGB(0, 255, 0)
-frame1.BorderSizePixel = 2
-frame1.Parent = mainFrame
-
--- Adicionando Título na Primeira Guia
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, 0, 0.2, 0)
-titleLabel.Position = UDim2.new(0, 0, 0, 0)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "ADOUFO INV-BETA V1"
-titleLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
-titleLabel.TextScaled = true
-titleLabel.Parent = frame1
-
--- Adicionando Campo de Texto para Nome do Jogador
-local nameBox = Instance.new("TextBox")
-nameBox.Size = UDim2.new(0.8, 0, 0.2, 0)
-nameBox.Position = UDim2.new(0.1, 0, 0.3, 0)
-nameBox.PlaceholderText = "Nome do Player"
-nameBox.Parent = frame1
-
--- Criando a Segunda Guia
-local frame2 = Instance.new("Frame")
-frame2.Size = UDim2.new(1, 0, 0, 200)
-frame2.Position = UDim2.new(0, 0, 0.428, 0)
-frame2.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-frame2.BorderColor3 = Color3.fromRGB(0, 255, 0)
-frame2.BorderSizePixel = 2
-frame2.Parent = mainFrame
-
--- Adicionando Título na Segunda Guia
-local inventoryLabel = Instance.new("TextLabel")
-inventoryLabel.Size = UDim2.new(1, 0, 0.2, 0)
-inventoryLabel.Position = UDim2.new(0, 0, 0, 0)
-inventoryLabel.BackgroundTransparency = 1
-inventoryLabel.Text = "Inventário"
-inventoryLabel.TextColor3 = Color3.fromRGB(255, 0, 0)  -- Alterado para vermelho
-inventoryLabel.TextScaled = true
-inventoryLabel.Parent = frame2
-
--- Adicionando Lista de Inventário
-local inventoryList = Instance.new("TextLabel")
-inventoryList.Size = UDim2.new(0.9, 0, 0.7, 0)
-inventoryList.Position = UDim2.new(0.05, 0, 0.25, 0)
-inventoryList.BackgroundTransparency = 1
-inventoryList.Text = ""
-inventoryList.TextColor3 = Color3.fromRGB(255, 255, 255)
-inventoryList.TextScaled = true
-inventoryList.TextWrapped = true
-inventoryList.Parent = frame2
-
--- Função para obter inventário do jogador
-local function getInventory(playerName)
-    local player = game.Players:FindFirstChild(playerName)
-    if player then
-        local inventoryItems = {}
-        for _, item in ipairs(player.Backpack:GetChildren()) do
-            table.insert(inventoryItems, item.Name)
-        end
-        if #inventoryItems == 0 then
-            return "Este jogador não tem nada no inventário"
-        else
-            return table.concat(inventoryItems, ", ")
-        end
-    else
-        return "Jogador não encontrado"
-    end
+-- Função para adicionar efeito visual às bolas
+local function addVisualEffect(part, textureId)
+    part.Texture = textureId  -- Define a textura da bola com o ID fornecido
+    part.Size = Vector3.new(5, 5, 5)  -- Ajuste o tamanho conforme necessário
 end
 
--- Conectar função ao campo de texto
-nameBox.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
-        local playerName = nameBox.Text
-        inventoryList.Text = getInventory(playerName)
+-- Função para iniciar a animação de apontar
+local function playPointAnimation(character)
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then
+        return
     end
-end)
+
+    local animator = humanoid:FindFirstChildOfClass("Animator")
+    if not animator then
+        return
+    end
+
+    local pointAnimation = animator:LoadAnimation(script.Parent.PointAnimation)  -- Nome do arquivo de animação
+    pointAnimation:Play()
+end
+
+-- Função principal para quando o jogador ativa a ferramenta
+local function onActivated()
+    local player = Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local backpack = player:WaitForChild("Backpack")
+
+    local tool = Instance.new("Tool")
+    tool.Name = "VAZIO ROXO"
+    tool.RequiresHandle = false
+    tool.Parent = backpack
+
+    tool.Activated:Connect(function()
+        -- Mostrar a GUI temporária ao jogador
+        showTemporaryGUI(player)
+
+        -- Posicionar a bola roxa 5 studs longe do jogador
+        local purpleBall = Instance.new("Part")
+        purpleBall.Shape = Enum.PartType.Ball
+        purpleBall.Color = Color3.fromRGB(128, 0, 128)
+        purpleBall.Size = Vector3.new(10, 10, 10)
+        purpleBall.Anchored = false
+        purpleBall.CanCollide = false  -- Definir como não colidível
+        purpleBall.CFrame = character.Head.CFrame * CFrame.new(0, 0, -5)  -- Posicionar 5 studs à frente do jogador
+        purpleBall.Parent = workspace
+
+        addVisualEffect(purpleBall, "rbxassetid://YOUR_PURPLE_TEXTURE_ID")  -- Substitua pelo ID da textura roxa
+
+        -- Lançar a bola roxa para frente até 20 studs
+        local distanceTraveled = 0
+        local maxDistance = 20
+        local direction = character.Head.CFrame.lookVector
+        local speed = 50
+
+        local function movePurpleBall()
+            while distanceTraveled < maxDistance do
+                if not purpleBall or not purpleBall.Parent then
+                    break
+                end
+
+                local newPosition = purpleBall.Position + direction * speed * wait()
+                purpleBall.Position = newPosition
+                distanceTraveled = distanceTraveled + speed
+            end
+
+            if purpleBall and purpleBall.Parent then
+                createExplosion(purpleBall.Position, player)
+                purpleBall:Destroy()
+            end
+        end
+
+        movePurpleBall()
+    end)
+end
+
+onActivated()  -- Chamar a função para iniciar o processo quando o script é executado inicialmente
