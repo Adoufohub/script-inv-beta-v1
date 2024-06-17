@@ -1,0 +1,200 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+-- Função para criar uma explosão controlada e emitir partículas coloridas
+local function createExplosion(position, playerToIgnore, color)
+    local explosion = Instance.new("Explosion")
+    explosion.Position = position
+    explosion.BlastRadius = 5  -- Ajuste o raio da explosão conforme necessário (1 metro quadrado)
+    explosion.BlastPressure = 500000
+    explosion.DestroyJointRadiusPercent = 1
+    explosion.Parent = workspace
+
+    -- Emitir partículas na área da explosão
+    local particleEmitter = Instance.new("ParticleEmitter")
+    particleEmitter.Color = ColorSequence.new(color)
+    particleEmitter.Size = NumberSequence.new(5)
+    particleEmitter.Texture = "rbxassetid://244912518"  -- Textura de faísca do Roblox
+    particleEmitter.Lifetime = NumberRange.new(5)
+    particleEmitter.Speed = NumberRange.new(20)
+    particleEmitter.Rate = 1000
+    particleEmitter.Parent = explosion
+
+    -- Danificar jogadores na explosão
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= playerToIgnore then
+            local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:TakeDamage(100)  -- Ajuste conforme necessário
+            end
+        end
+    end
+
+    -- Criar uma luz forte na explosão
+    local light = Instance.new("PointLight")
+    light.Color = color
+    light.Brightness = 10
+    light.Range = 20
+    light.Parent = explosion
+    wait(7)  -- Luz dura 7 segundos
+    light:Destroy()
+
+    -- Aguardar 5 segundos antes de destruir o emissor de partículas
+    wait(5)
+    particleEmitter:Destroy()
+end
+
+-- Função para exibir a GUI temporária ao jogador
+local function showTemporaryGUI(player, message)
+    local gui = Instance.new("ScreenGui")
+    gui.Parent = player.PlayerGui
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0.3, 0, 0.1, 0)
+    frame.Position = UDim2.new(0.5, 0, 0.1, 0)
+    frame.AnchorPoint = Vector2.new(0.5, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    frame.BackgroundTransparency = 0.5
+    frame.BorderSizePixel = 0
+    frame.Parent = gui
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.Text = message
+    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Font = Enum.Font.SourceSansBold
+    textLabel.TextScaled = true
+    textLabel.Parent = frame
+
+    -- Remover a GUI após 3 segundos
+    wait(3)
+    gui:Destroy()
+end
+
+-- Função para iniciar a animação de apontar
+local function playPointAnimation(character)
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then
+        return
+    end
+
+    local animator = humanoid:FindFirstChildOfClass("Animator")
+    if not animator then
+        return
+    end
+
+    local pointAnimation = animator:LoadAnimation(script.Parent.PointAnimation)  -- Nome do arquivo de animação
+    pointAnimation:Play()
+end
+
+-- Função para criar e lançar a bola roxa
+local function createPurpleBall(character, player)
+    local purpleBall = Instance.new("Part")
+    purpleBall.Shape = Enum.PartType.Ball
+    purpleBall.Size = Vector3.new(10, 10, 10)
+    purpleBall.Anchored = false
+    purpleBall.Color = Color3.fromRGB(128, 0, 128)
+    purpleBall.CFrame = character.Head.CFrame * CFrame.new(0, 0, -5)
+    purpleBall.Parent = workspace
+
+    -- Posicionar a bola roxa 5 studs longe do jogador na direção que ele está olhando
+    local spawnPosition = character.Head.CFrame * CFrame.new(0, 0, -5) * CFrame.new(0, 0, -5)
+    purpleBall.CFrame = spawnPosition
+
+    -- Lançar a bola roxa para frente
+    local bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.Velocity = character.Head.CFrame.lookVector * 100
+    bodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+    bodyVelocity.Parent = purpleBall
+
+    local debounce = false
+    purpleBall.Touched:Connect(function(hit)
+        if not debounce and hit and hit:IsDescendantOf(workspace) then
+            local distance = (hit.Position - purpleBall.Position).magnitude
+            if distance >= 20 then  -- Aproximadamente 20 studs de distância
+                createExplosion(purpleBall.Position, player, Color3.fromRGB(128, 0, 128))
+                debounce = true
+                purpleBall:Destroy()
+            end
+        end
+    end)
+end
+
+-- Função para criar e lançar a bola vermelha
+local function createRedBall(character, player)
+    local redBall = Instance.new("Part")
+    redBall.Shape = Enum.PartType.Ball
+    redBall.Size = Vector3.new(5, 5, 5)
+    redBall.Anchored = false
+    redBall.Color = Color3.fromRGB(255, 0, 0)
+    redBall.CFrame = character.Head.CFrame * CFrame.new(0, 0, -5)
+    redBall.Parent = workspace
+
+    -- Posicionar a bola vermelha 5 studs longe do jogador na direção que ele está olhando
+    local spawnPosition = character.Head.CFrame * CFrame.new(0, 0, -5)
+    redBall.CFrame = spawnPosition
+
+    -- Lançar a bola vermelha para frente
+    local bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.Velocity = character.Head.CFrame.lookVector * 50
+    bodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+    bodyVelocity.Parent = redBall
+
+    -- Explodir após 4 segundos
+    wait(4)
+    createExplosion(redBall.Position, player, Color3.fromRGB(255, 0, 0))
+    redBall:Destroy()
+end
+
+-- Função principal para quando o jogador ativa a ferramenta
+local function onActivated()
+    local player = Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local backpack = player:WaitForChild("Backpack")
+
+    -- Ferramenta VAZIO ROXO
+    local purpleTool = Instance.new("Tool")
+    purpleTool.Name = "VAZIO ROXO"
+    purpleTool.RequiresHandle = false
+    purpleTool.Parent = backpack
+
+    purpleTool.Activated:Connect(function()
+        -- Mostrar a GUI temporária ao jogador
+        showTemporaryGUI(player, "Vou te fazer viajar pra um mundo bem mais que infinito! Veja no fundo do olhar, maldição, esse é seu exterminio!")
+
+        -- Criar as bolas azul e vermelha
+        local blueBall = Instance.new("Part")
+        blueBall.Shape = Enum.PartType.Ball
+        blueBall.Size = Vector3.new(5, 5, 5)
+        blueBall.Anchored = true
+        blueBall.Color = Color3.fromRGB(0, 0, 255)
+        blueBall.CFrame = character.Head.CFrame * CFrame.new(-5, 0, -10)
+        blueBall.Parent = workspace
+
+        local redBall = Instance.new("Part")
+        redBall.Shape = Enum.PartType.Ball
+        redBall.Size = Vector3.new(5, 5, 5)
+        redBall.Anchored = true
+        redBall.Color = Color3.fromRGB(255, 0, 0)
+        redBall.CFrame = character.Head.CFrame * CFrame.new(5, 0, -10)
+        redBall.Parent = workspace
+
+        -- Aproximar as bolas imediatamente e adicionar efeitos visuais
+        local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+        local goalBlue = {CFrame = character.Head.CFrame * CFrame.new(0, 0, -5)}
+        local goalRed = {CFrame = character.Head.CFrame * CFrame.new(0, 0, -5)}
+
+        local tweenBlue = TweenService:Create(blueBall, tweenInfo, goalBlue)
+        local tweenRed = TweenService:Create(redBall, tweenInfo, goalRed)
+
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://6667923288"
+        sound.Parent = character.Head
+        sound:Play()
+
+        tweenBlue:Play()
+        tweenRed:Play()
+
+        -- Após as bolas se juntarem, criar a bola roxa
