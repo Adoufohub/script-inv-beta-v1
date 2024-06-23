@@ -1,0 +1,230 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Chave correta para acessar a aba principal
+local correctKey = "fatal11ty"
+
+-- Criar uma ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = playerGui
+
+-- Criar a Frame principal (inicialmente invisível)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 300, 0, 200)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+mainFrame.BackgroundTransparency = 0.5
+mainFrame.BorderColor3 = Color3.new(1, 0, 0)
+mainFrame.BorderSizePixel = 3
+mainFrame.Visible = false
+mainFrame.Parent = screenGui
+
+-- Criar a Frame do sistema de chave
+local keyFrame = Instance.new("Frame")
+keyFrame.Size = UDim2.new(0, 300, 0, 100)
+keyFrame.Position = UDim2.new(0.5, -150, 0.5, -50)
+keyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+keyFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+keyFrame.BackgroundTransparency = 0.5
+keyFrame.BorderColor3 = Color3.new(1, 0, 0)
+keyFrame.BorderSizePixel = 3
+keyFrame.Parent = screenGui
+
+-- Título "Key Sistem"
+local keyTitleLabel = Instance.new("TextLabel")
+keyTitleLabel.Size = UDim2.new(1, 0, 0.3, 0)
+keyTitleLabel.Position = UDim2.new(0, 0, 0, 0)
+keyTitleLabel.Text = "Key Sistem"
+keyTitleLabel.TextColor3 = Color3.new(0.5, 0, 1)
+keyTitleLabel.BackgroundTransparency = 1
+keyTitleLabel.TextScaled = true
+keyTitleLabel.Parent = keyFrame
+
+-- Campo de texto para inserir a chave
+local keyBox = Instance.new("TextBox")
+keyBox.Size = UDim2.new(0.8, 0, 0.3, 0)
+keyBox.Position = UDim2.new(0.1, 0, 0.35, 0)
+keyBox.PlaceholderText = "Insira a chave aqui"
+keyBox.Text = ""
+keyBox.TextScaled = true
+keyBox.BackgroundTransparency = 0.2
+keyBox.BackgroundColor3 = Color3.new(1, 1, 1)
+keyBox.TextColor3 = Color3.new(0, 0, 0)
+keyBox.Parent = keyFrame
+
+-- Botão "Enter"
+local enterButton = Instance.new("TextButton")
+enterButton.Size = UDim2.new(0.4, 0, 0.3, 0)
+enterButton.Position = UDim2.new(0.05, 0, 0.7, 0)
+enterButton.Text = "Enter"
+enterButton.BackgroundColor3 = Color3.new(0.5, 0, 0)
+enterButton.TextColor3 = Color3.new(1, 1, 1)
+enterButton.Parent = keyFrame
+
+-- Botão "Limpar"
+local clearKeyButton = Instance.new("TextButton")
+clearKeyButton.Size = UDim2.new(0.4, 0, 0.3, 0)
+clearKeyButton.Position = UDim2.new(0.55, 0, 0.7, 0)
+clearKeyButton.Text = "Limpar"
+clearKeyButton.BackgroundColor3 = Color3.new(0.5, 0, 0)
+clearKeyButton.TextColor3 = Color3.new(1, 1, 1)
+clearKeyButton.Parent = keyFrame
+
+-- Função para verificar a chave e mostrar a aba principal
+enterButton.MouseButton1Click:Connect(function()
+    if keyBox.Text == correctKey then
+        keyFrame.Visible = false
+        mainFrame.Visible = true
+    else
+        keyBox.Text = ""
+        warn("Chave incorreta")
+    end
+end)
+
+-- Função para o botão "Limpar"
+clearKeyButton.MouseButton1Click:Connect(function()
+    keyBox.Text = ""
+end)
+
+-- Aplicar a textura de fundo
+local texture = Instance.new("ImageLabel")
+texture.Size = UDim2.new(1, 0, 1, 0)
+texture.Position = UDim2.new(0, 0, 0, 0)
+texture.Image = "rbxassetid://18170059552"
+texture.BackgroundTransparency = 1
+texture.ZIndex = 0
+texture.Parent = mainFrame
+
+-- Campo de texto para inserir scripts
+local scriptBox = Instance.new("TextBox")
+scriptBox.Size = UDim2.new(1, 0, 1, 0)
+scriptBox.Position = UDim2.new(0, 0, 0, 0)
+scriptBox.Text = ""
+scriptBox.TextWrapped = true
+scriptBox.ClearTextOnFocus = false
+scriptBox.BackgroundTransparency = 1
+scriptBox.TextColor3 = Color3.new(0, 0, 0)
+scriptBox.Parent = mainFrame
+
+-- Título "Jade executor"
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0.2, 0)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.Text = "Jade executor"
+titleLabel.TextColor3 = Color3.new(0, 0, 1)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextScaled = true
+titleLabel.ZIndex = 1
+titleLabel.Parent = mainFrame
+
+-- Botão "Executar"
+local executeButton = Instance.new("TextButton")
+executeButton.Size = UDim2.new(0.4, 0, 0.2, 0)
+executeButton.Position = UDim2.new(0.05, 0, 0.7, 0)
+executeButton.Text = "Executar"
+executeButton.BackgroundColor3 = Color3.new(0.5, 0, 0)
+executeButton.TextColor3 = Color3.new(1, 1, 1)
+executeButton.ZIndex = 1
+executeButton.Parent = mainFrame
+
+-- Botão "Limpar"
+local clearButton = Instance.new("TextButton")
+clearButton.Size = UDim2.new(0.4, 0, 0.2, 0)
+clearButton.Position = UDim2.new(0.55, 0, 0.7, 0)
+clearButton.Text = "Limpar"
+clearButton.BackgroundColor3 = Color3.new(0.5, 0, 0)
+clearButton.TextColor3 = Color3.new(1, 1, 1)
+clearButton.ZIndex = 1
+clearButton.Parent = mainFrame
+
+-- Botão "Diminuir"
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0.2, 0, 0.2, 0)
+minimizeButton.Position = UDim2.new(0.8, 0, 0, 0)
+minimizeButton.Text = "-"
+minimizeButton.BackgroundColor3 = Color3.new(0.5, 0, 0)
+minimizeButton.TextColor3 = Color3.new(1, 1, 1)
+minimizeButton.ZIndex = 1
+minimizeButton.Parent = mainFrame
+
+-- Botão "Aumentar" (inicialmente invisível)
+local maximizeButton = Instance.new("TextButton")
+maximizeButton.Size = UDim2.new(0.2, 0, 0.2, 0)
+maximizeButton.Position = UDim2.new(0.8, 0, 0, 0)
+maximizeButton.Text = "+"
+maximizeButton.BackgroundColor3 = Color3.new(0.5, 0, 0)
+maximizeButton.TextColor3 = Color3.new(1, 1, 1)
+maximizeButton.Visible = false
+maximizeButton.ZIndex = 1
+maximizeButton.Parent = mainFrame
+
+-- Funcionalidade para mover a GUI
+local dragging = false
+local dragInput, mousePos, framePos
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        mousePos = input.Position
+        framePos = mainFrame.Position
+    end
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - mousePos
+        mainFrame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+    end
+end)
+
+mainFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+mainFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+-- Funcionalidade para minimizar e maximizar a GUI
+minimizeButton.MouseButton1Click:Connect(function()
+    mainFrame.Size = UDim2.new(0, 150, 0, 100)
+    minimizeButton.Visible = false
+    maximizeButton.Visible = true
+end)
+
+maximizeButton.MouseButton1Click:Connect(function()
+    mainFrame.Size = UDim2.new(0, 300, 0, 200)
+    minimizeButton.Visible = true
+    maximizeButton.Visible = false
+end)
+
+-- Função para o botão "Executar"
+executeButton.MouseButton1Click:Connect(function()
+    local scriptText = scriptBox.Text
+    local success, result = pcall(function()
+        return loadstring(scriptText)()
+    end)
+    if success then
+        print("Script executado com sucesso.")
+    else
+        warn("Erro ao executar o script: "..tostring(result))
+    end
+end)
+
+-- Função para o botão "Limpar"
+clearButton.MouseButton1Click:Connect(function()
+    scriptBox.Text = ""
+    print("Script limpo")
+end)
