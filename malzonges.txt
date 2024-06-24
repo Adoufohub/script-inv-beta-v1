@@ -1,0 +1,110 @@
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Debris = game:GetService("Debris")
+local TeleportService = game:GetService("TeleportService")
+
+-- Função para configurar o ambiente vermelho
+local function setRedEnvironment()
+    -- Configurações do céu vermelho
+    local sky = Lighting:FindFirstChildOfClass("Sky")
+    if not sky then
+        sky = Instance.new("Sky")
+        sky.Parent = Lighting
+    end
+    sky.SkyboxBk = "rbxassetid://18190167358" -- Textura do céu para o lado de trás
+    sky.SkyboxDn = "rbxassetid://18190167358" -- Textura do céu para baixo
+    sky.SkyboxFt = "rbxassetid://18190167358" -- Textura do céu para frente
+    sky.SkyboxLf = "rbxassetid://18190167358" -- Textura do céu para a esquerda
+    sky.SkyboxRt = "rbxassetid://18190167358" -- Textura do céu para a direita
+    sky.SkyboxUp = "rbxassetid://18190167358" -- Textura do céu para cima
+
+    -- Configurações de luz vermelha
+    Lighting.Ambient = Color3.fromRGB(255, 0, 0) -- Cor ambiente vermelha
+    Lighting.OutdoorAmbient = Color3.fromRGB(128, 0, 0) -- Iluminação ambiente externa vermelha
+    Lighting.Brightness = 0.4 -- Intensidade da luz
+end
+
+-- Função para aplicar textura em todas as partes e meshparts
+local function applyTextureToMap(textureId)
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("Part") or obj:IsA("MeshPart") then
+            -- Verifica se a parte já tem um decal
+            local decal = obj:FindFirstChildOfClass("Decal")
+            if not decal then
+                -- Cria um novo decal se não existir
+                decal = Instance.new("Decal")
+                decal.Parent = obj
+            end
+            -- Define a nova textura
+            decal.Texture = textureId
+        end
+    end
+end
+
+-- Função para adicionar efeito de fogo em um jogador
+local function addPlayerFire(player)
+    local character = player.Character
+    if character then
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            local fire = Instance.new("Part")
+            fire.Name = "PlayerFire"
+            fire.Size = Vector3.new(2, 2, 2) -- Tamanho do fogo
+            fire.Anchored = true
+            fire.CanCollide = false
+            fire.Transparency = 1 -- Fogo invisível, apenas para efeitos de partículas
+            fire.Parent = character
+            fire.CFrame = character.PrimaryPart.CFrame * CFrame.new(0, 1, 0) -- Posição acima do personagem
+
+            local fireParticle = Instance.new("ParticleEmitter")
+            fireParticle.Color = ColorSequence.new(Color3.fromRGB(255, 0, 0)) -- Cor das partículas de fogo (vermelho)
+            fireParticle.Size = NumberSequence.new(2) -- Tamanho das partículas de fogo
+            fireParticle.Texture = "rbxassetid://18190193113" -- Textura das partículas de fogo
+            fireParticle.Parent = fire
+            fireParticle.Lifetime = NumberRange.new(2) -- Tempo de vida das partículas
+            fireParticle.Rate = 200 -- Taxa de emissão de partículas por segundo
+            fireParticle.Speed = NumberRange.new(10) -- Velocidade das partículas
+            fireParticle.VelocitySpread = 180 -- Espalhamento de velocidade das partículas
+
+            -- Limpa o fogo quando o jogador morrer ou sair do jogo
+            humanoid.Died:Connect(function()
+                fire:Destroy()
+            end)
+            player.CharacterRemoving:Connect(function()
+                fire:Destroy()
+            end)
+        end
+    end
+end
+
+-- Identificador do som
+local soundId = "rbxassetid://15689451063" -- ID do som a ser reproduzido (música)
+
+-- Função para configurar o ambiente e elementos visuais do jogo
+local function configureGameEnvironment()
+    -- Configura o ambiente visual
+    setRedEnvironment()
+
+    -- Aplica textura em todas as partes e meshparts
+    applyTextureToMap("rbxassetid://18190167358")
+
+    -- Adiciona o efeito de fogo em todos os jogadores
+    for _, player in ipairs(Players:GetPlayers()) do
+        addPlayerFire(player)
+    end
+
+    -- Toca a música
+    local sound = Instance.new("Sound")
+    sound.SoundId = soundId
+    sound.Volume = 10 -- Volume do som
+    sound.Looped = true -- Reproduzir em loop
+    sound.Parent = game.Workspace
+    sound:Play()
+end
+
+-- Executa a configuração do ambiente e elementos visuais quando o script é iniciado
+configureGameEnvironment()
+
+-- O script não precisa ser movido para dentro de pastas ou arquivos específicos,
+-- pois ele afeta o ambiente do jogo diretamente onde foi executado.
