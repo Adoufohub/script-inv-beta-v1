@@ -1,0 +1,99 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Chave correta para acessar a aba principal
+local correctKey = "fatal11ty"
+
+-- Criar uma ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = playerGui
+
+-- Criar a Frame principal (inicialmente invisível)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 300, 0, 200)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+mainFrame.BackgroundTransparency = 0.5
+mainFrame.BorderColor3 = Color3.new(1, 0, 0)
+mainFrame.BorderSizePixel = 3
+mainFrame.Visible = false
+mainFrame.Parent = screenGui
+
+-- Criar a Frame do sistema de chave
+local keyFrame = Instance.new("Frame")
+keyFrame.Size = UDim2.new(0, 300, 0, 100)
+keyFrame.Position = UDim2.new(0.5, -150, 0.5, -50)
+keyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+keyFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+keyFrame.BackgroundTransparency = 0.5
+keyFrame.BorderColor3 = Color3.new(1, 0, 0)
+keyFrame.BorderSizePixel = 3
+keyFrame.Parent = screenGui
+
+-- Título "Key Sistem"
+local keyTitleLabel = Instance.new("TextLabel")
+keyTitleLabel.Size = UDim2.new(1, 0, 0.3, 0)
+keyTitleLabel.Position = UDim2.new(0, 0, 0, 0)
+keyTitleLabel.Text = "Key Sistem"
+keyTitleLabel.TextColor3 = Color3.new(0.5, 0, 1)
+keyTitleLabel.BackgroundTransparency = 1
+keyTitleLabel.TextScaled = true
+keyTitleLabel.Parent = keyFrame
+
+-- Campo de texto para inserir a chave
+local keyBox = Instance.new("TextBox")
+keyBox.Size = UDim2.new(0.8, 0, 0.3, 0)
+keyBox.Position = UDim2.new(0.1, 0, 0.35, 0)
+keyBox.PlaceholderText = "Insira a chave aqui"
+keyBox.Text = ""
+keyBox.TextScaled = true
+keyBox.BackgroundTransparency = 0.2
+keyBox.BackgroundColor3 = Color3.new(1, 1, 1)
+keyBox.TextColor3 = Color3.new(0, 0, 0)
+keyBox.Parent = keyFrame
+
+-- Botão "Enter"
+local enterButton = Instance.new("TextButton")
+enterButton.Size = UDim2.new(0.4, 0, 0.3, 0)
+enterButton.Position = UDim2.new(0.05, 0, 0.7, 0)
+enterButton.Text = "Enter"
+enterButton.BackgroundColor3 = Color3.new(0.5, 0, 0)
+enterButton.TextColor3 = Color3.new(1, 1, 1)
+enterButton.Parent = keyFrame
+
+-- Botão "Limpar"
+local clearKeyButton = Instance.new("TextButton")
+clearKeyButton.Size = UDim2.new(0.4, 0, 0.3, 0)
+clearKeyButton.Position = UDim2.new(0.55, 0, 0.7, 0)
+clearKeyButton.Text = "Limpar"
+clearKeyButton.BackgroundColor3 = Color3.new(0.5, 0, 0)
+clearKeyButton.TextColor3 = Color3.new(1, 1, 1)
+clearKeyButton.Parent = keyFrame
+
+-- Função para verificar a chave e mostrar a aba principal
+enterButton.MouseButton1Click:Connect(function()
+    if keyBox.Text == correctKey then
+        keyFrame.Visible = false
+        mainFrame.Visible = true
+    else
+        keyBox.Text = ""
+        warn("Chave incorreta")
+    end
+end)
+
+-- Função para o botão "Limpar"
+clearKeyButton.MouseButton1Click:Connect(function()
+    keyBox.Text = ""
+end)
+
+-- Aplicar a textura de fundo
+local texture = Instance.new("ImageLabel")
+texture.Size = UDim2.new(1, 0, 1, 0)
+texture.Position = UDim2.new(0, 0, 0, 0)
+texture.Image = "rbxassetid://18170059552"
+texture.BackgroundTransparency = 1
+texture.ZIndex = 0
+texture.Parent = mainFrame
+
