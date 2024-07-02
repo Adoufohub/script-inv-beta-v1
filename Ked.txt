@@ -1,0 +1,32 @@
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local textBox = Instance.new("TextBox")
+textBox.Parent = screenGui
+textBox.Size = UDim2.new(1, 0, 1, 0)
+textBox.Position = UDim2.new(0, 0, 0, 0)
+textBox.BackgroundColor3 = Color3.new(148, 0, 211)
+textBox.TextColor3 = Color3.new(0, 250, 0, 30)
+textBox.Text = ""
+textBox.TextScaled = true
+textBox.PlaceholderText = " "
+
+local texture = Instance.new("ImageLabel")
+texture.Size = UDim2.new(1, 0, 1, 0)
+texture.Position = UDim2.new(0, 0, 0, 0)
+texture.Image = "rbxassetid://18170059552"
+texture.BackgroundTransparency = 1
+texture.ZIndex = 1
+texture.Parent = mainFrame
+
+textBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed and textBox.Text == "/open Gui" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Xtentacion178/Dhdbdbbe/main/Thdhbdbr"))()
+    end
+end)
+
+textBox.FocusLost:Connect(Function(enterPressed)
+    if  enterPressed then
+      showServerMessage("Fragiotatx join game (:", 0)
+    end
+end)
