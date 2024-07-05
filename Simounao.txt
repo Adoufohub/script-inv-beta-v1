@@ -1,0 +1,179 @@
+local Library = {
+    Toggle = {},
+    Bind = {},
+    Color = {}
+}
+
+local Utility = {}
+local Services = setmetatable({}, {
+    __index = function(Self, Index)
+        local NewService = game:GetService(Index)
+        if NewService then
+            Self[Index] = NewService
+        end
+        return NewService
+    end
+})
+
+local PageInst = Instance.new("ScreenGui")
+PageInst.Name = game:GetService("HttpService"):GenerateGUID(false)
+PageInst.Parent = gethui and gethui() or game:GetService("CoreGui")
+PageInst.ZIndexBehavior = Enum.ZIndexBehavior.Global
+
+local Themes = {
+    Default = {
+        Main = Color3.fromRGB(25, 25, 25),
+        Second = Color3.fromRGB(32, 32, 32),
+        Stroke = Color3.fromRGB(60, 60, 60),
+        Divider = Color3.fromRGB(255, 255, 255), -- Cor das divisórias mudada para branco
+        Text = Color3.fromRGB(240, 240, 240),
+        TextDark = Color3.fromRGB(150, 150, 150)
+    }
+}
+
+function Library:Window(WindowTitle)
+    local WindowInst = Instance.new("Frame")
+    local StrokeInst = Instance.new("UIStroke")
+    local DividerInst = Instance.new("Frame")
+    local WindowLabelInst = Instance.new("TextLabel")
+    local WindowCornerInst = Instance.new("UICorner")
+    local DividerCornerInst = Instance.new("UICorner")
+    local DividerStrokeInst = Instance.new("UIStroke")
+    local Window = {
+        PageCount = 0,
+        Pages = {},
+        Open = true,
+        Tabbing = false,
+        CurrentPage = nil,
+        Debounce = true
+    }
+
+    WindowInst.BackgroundColor3 = Themes.Default.Main
+    WindowInst.ClipsDescendants = true
+    WindowInst.Position = UDim2.new(0.5, -250, 0.5, -250)
+    WindowInst.Size = UDim2.new(0, 500, 0, 30)
+    WindowInst.Name = "WindowInst"
+    WindowInst.Parent = PageInst
+
+    WindowCornerInst.CornerRadius = UDim.new(0, 5)
+    WindowCornerInst.Parent = WindowInst
+
+    StrokeInst.Color = Themes.Default.Stroke
+    StrokeInst.Parent = WindowInst
+
+    DividerInst.BackgroundColor3 = Themes.Default.Divider
+    DividerInst.BorderSizePixel = 0
+    DividerInst.Position = UDim2.new(0, 0, 1, 0)
+    DividerInst.Size = UDim2.new(1, 0, 0, 1)
+    DividerInst.Name = "DividerInst"
+    DividerInst.Parent = WindowInst
+
+    DividerCornerInst.CornerRadius = UDim.new(0, 5)
+    DividerCornerInst.Parent = DividerInst
+
+    DividerStrokeInst.Color = Themes.Default.Stroke
+    DividerStrokeInst.Parent = DividerInst
+
+    WindowLabelInst.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    WindowLabelInst.BackgroundTransparency = 1
+    WindowLabelInst.Size = UDim2.new(1, 0, 1, 0)
+    WindowLabelInst.Font = Enum.Font.Gotham
+    WindowLabelInst.Text = WindowTitle or "Window"
+    WindowLabelInst.TextColor3 = Themes.Default.Text
+    WindowLabelInst.TextSize = 14
+    WindowLabelInst.TextStrokeTransparency = 0.9
+    WindowLabelInst.Parent = WindowInst
+
+    Utility:DraggingEnabled(WindowInst)
+
+    function Window:Page(PageTitle)
+        local PageButtonInst = Instance.new("TextButton")
+        local PageButtonCornerInst = Instance.new("UICorner")
+        local PageFrameInst = Instance.new("ScrollingFrame")
+        local PageListLayoutInst = Instance.new("UIListLayout")
+        local Page = {
+            SectionCount = 0,
+            Sections = {},
+            Open = false
+        }
+
+        Window.PageCount = Window.PageCount + 1
+        PageButtonInst.Name = "PageButtonInst"
+        PageButtonInst.Parent = PageInst
+
+        PageFrameInst.BackgroundColor3 = Themes.Default.Main
+        PageFrameInst.ClipsDescendants = true
+        PageFrameInst.Size = UDim2.new(0, 500, 0, 0)
+        PageFrameInst.ScrollBarThickness = 0
+        PageFrameInst.ScrollBarImageTransparency = 1
+        PageFrameInst.Name = "PageFrameInst"
+        PageFrameInst.Parent = PageInst
+        PageFrameInst.Visible = false
+
+        PageListLayoutInst.SortOrder = Enum.SortOrder.LayoutOrder
+        PageListLayoutInst.Padding = UDim.new(0, 5)
+        PageListLayoutInst.Parent = PageFrameInst
+
+        PageButtonCornerInst.CornerRadius = UDim.new(0, 5)
+        PageButtonCornerInst.Parent = PageButtonInst
+
+        PageButtonInst.BackgroundColor3 = Themes.Default.Main
+        PageButtonInst.Size = UDim2.new(1, 0, 0, 30)
+        PageButtonInst.Font = Enum.Font.Gotham
+        PageButtonInst.Text = PageTitle or "Page"
+        PageButtonInst.TextColor3 = Themes.Default.Text
+        PageButtonInst.TextSize = 14
+        PageButtonInst.TextStrokeTransparency = 0.9
+        PageButtonInst.Parent = PageInst
+
+        function Page:Section(SectionTitle)
+            local SectionInst = Instance.new("Frame")
+            local SectionLabelInst = Instance.new("TextLabel")
+            local SectionCornerInst = Instance.new("UICorner")
+            local SectionDividerInst = Instance.new("Frame")
+            local SectionListLayoutInst = Instance.new("UIListLayout")
+            local Section = {
+                ElementCount = 0,
+                Elements = {}
+            }
+
+            Page.SectionCount = Page.SectionCount + 1
+            SectionInst.BackgroundColor3 = Themes.Default.Second
+            SectionInst.Size = UDim2.new(1, -10, 0, 30)
+            SectionInst.Name = "SectionInst"
+            SectionInst.Parent = PageFrameInst
+
+            SectionCornerInst.CornerRadius = UDim.new(0, 5)
+            SectionCornerInst.Parent = SectionInst
+
+            SectionDividerInst.BackgroundColor3 = Themes.Default.Divider
+            SectionDividerInst.BorderSizePixel = 0
+            SectionDividerInst.Position = UDim2.new(0, 0, 1, 0)
+            SectionDividerInst.Size = UDim2.new(1, 0, 0, 1)
+            SectionDividerInst.Name = "SectionDividerInst"
+            SectionDividerInst.Parent = SectionInst
+
+            SectionLabelInst.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            SectionLabelInst.BackgroundTransparency = 1
+            SectionLabelInst.Size = UDim2.new(1, 0, 1, 0)
+            SectionLabelInst.Font = Enum.Font.Gotham
+            SectionLabelInst.Text = SectionTitle or "Section"
+            SectionLabelInst.TextColor3 = Themes.Default.Text
+            SectionLabelInst.TextSize = 14
+            SectionLabelInst.TextStrokeTransparency = 0.9
+            SectionLabelInst.Parent = SectionInst
+
+            SectionListLayoutInst.SortOrder = Enum.SortOrder.LayoutOrder
+            SectionListLayoutInst.Padding = UDim.new(0, 5)
+            SectionListLayoutInst.Parent = SectionInst
+
+            return Section
+        end
+
+        return Page
+    end
+
+    return Window
+end
+
+return Library
